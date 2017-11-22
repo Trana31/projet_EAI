@@ -1,7 +1,5 @@
 package app;
 
-import clients_ws.ServiceBanque;
-import clients_ws.ServiceBanque_Service;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.jms.JMSException;
@@ -32,7 +30,7 @@ public class GestionPersonnelListener implements MessageListener {
 
     @Override
     public void onMessage(Message message) {
-
+/*
         try {
             Topic source = (Topic) message.getJMSDestination();
 
@@ -74,7 +72,7 @@ public class GestionPersonnelListener implements MessageListener {
                             System.out.println("\t --> Coord. bancaires NOK");
                         }*/
                         // envoi de la réponse de la banque
-                        ObjectMessage msg = session.createObjectMessage(cmd);
+                        /*ObjectMessage msg = session.createObjectMessage(cmd);
                         mp1.send(msg);
                     }
                 }
@@ -98,13 +96,13 @@ public class GestionPersonnelListener implements MessageListener {
         } catch (JMSException ex) {
             Logger.getLogger(GestionPersonnelListener.class.getName()).log(Level.SEVERE, null, ex);
         }
-
+*/
     }
 
     private static boolean verifierCoordonnees(java.lang.String iban) {
-        clients_ws.ServiceBanque_Service service = new clients_ws.ServiceBanque_Service();
-        clients_ws.ServiceBanque port = service.getServiceBanquePort();
-        return port.verifierCoordonnees(iban);
+        /*clients_ws.ServiceBanque_Service service = new clients_ws.ServiceBanque_Service();
+        clients_ws.ServiceBanque port = service.getServiceBanquePort();*/
+        return true;
     }
 
 }

@@ -1,9 +1,13 @@
 package app;
 
-import clients_ws.ServiceBanque;
-import clients_ws.ServiceBanque_Service;
+
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.ejb.EJB;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
@@ -11,14 +15,20 @@ import javax.jms.MessageProducer;
 import javax.jms.ObjectMessage;
 import javax.jms.Session;
 import javax.jms.Topic;
+import message.Projet;
 import message.Nommage;
+import message.Salle;
+import webserver.SalleSingleton;
 
 /**
  *
  * @author elavinal
  */
 public class GestionSalleListener implements MessageListener {
-
+    
+    @EJB
+    SalleSingleton salles;
+    
     private final MessageProducer mp;
     private final Session session;
 
@@ -41,67 +51,66 @@ public class GestionSalleListener implements MessageListener {
                 if (message instanceof ObjectMessage) {
                     ObjectMessage om = (ObjectMessage) message;
                     Object obj = om.getObject();
-                    if (obj instanceof Commande) {
-                        Commande cmd = (Commande) obj;
-                        System.out.println("Commande " + cmd.getNumCommande() + " reçue --> vérifier coord. bancaires");
-                        String iban = cmd.getClient().getIban();
-                        // System.out.println("IBAN : " + iban);
-                        // TODO: Client SOAP ou REST pour effectuer la vérif
+                    if (obj instanceof Projet) {
                         
-                        if (verifierCoordonnees(iban)){
-                            // Vérif OK (~ 70%)
-                            cmd.setBanqueValide(true);
-                            System.out.println("\t --> Coord. bancaires OK");
-                        } else {
-                            // Vérif KO (~ 30%)
-                            cmd.setBanqueValide(false);
-                            System.out.println("\t --> Coord. bancaires NOK");
+                        int capaciteProjet = ((Projet) obj).getNbrParticipant();
+                        Date dateProjet = ((Projet) obj).getDateManif();
+                        
+                        HashMap lesSalles = salles.getSalles();
+                        
+                        Salle laSalleEnvoye = null;
+                        
+                        int i = 0;
+                        boolean salleTrouve = false;
+                        
+                        while(i<lesSalles.size() || salleTrouve){
+                            Salle uneSalle = (Salle)lesSalles.get(i);
+                            
+                            if(uneSalle.getCapacite() > capaciteProjet){
+                                if(!uneSalle.getLesdates().contains(dateProjet)){
+                                    ArrayList lesDates = salles.getSalles().get(i).getLesdates();
+                                    lesDates.add(dateProjet);
+                                    
+                                    salles.getSalles().get(i).setLesdates(lesDates);
+                                    
+                                    laSalleEnvoye = salles.getSalles().get(i);
+                                    
+                                    salleTrouve = true;
+                                }
+                            }
                         }
                         
-                        /*
-                        // Ici, simu par tirage aléatoire
-                        double r = Math.random();
-                        if (r > 0.3) {
-                            // Vérif OK (~ 70%)
-                            cmd.setBanqueValide(true);
-                            System.out.println("\t --> Coord. bancaires OK");
-                        } else {
-                            // Vérif KO (~ 30%)
-                            cmd.setBanqueValide(false);
-                            System.out.println("\t --> Coord. bancaires NOK");
-                        }*/
-                        // envoi de la réponse de la banque
-                        ObjectMessage msg = session.createObjectMessage(cmd);
+                        ObjectMessage msg = session.createObjectMessage(laSalleEnvoye);
                         mp.send(msg);
                     }
                 }
             }
 
-            if (topicName.equalsIgnoreCase(Nommage.INFOS_RESSOURCES_PREFACTURE)) {
+            /*if (topicName.equalsIgnoreCase(Nommage.INFOS_RESSOURCES_PREFACTURE)) {
 
                 if (message instanceof ObjectMessage) {
                     ObjectMessage om = (ObjectMessage) message;
                     Object obj = om.getObject();
-                    if (obj instanceof Commande) {
-                        Commande cmd = (Commande) obj;
-                        System.out.println("Commande " + cmd.getNumCommande() + " traitée reçue --> effectuer débit");
-                        System.out.println("\t TODO...");
+                    if (obj instanceof Salle) {
+                      
 
-                        // TODO: Client SOAP ou REST pour effectuer le débit
+                      
                     }
                 }
 
-            }
+            }*/
         } catch (JMSException ex) {
             Logger.getLogger(GestionRestaurationListener.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }
-
-    private static boolean verifierCoordonnees(java.lang.String iban) {
-        clients_ws.ServiceBanque_Service service = new clients_ws.ServiceBanque_Service();
-        clients_ws.ServiceBanque port = service.getServiceBanquePort();
-        return port.verifierCoordonnees(iban);
-    }
+//ici on recoit la date et la capacite depuis la ficheprojet mais non la reference
+  //  private static boolean verifierCapaciteSalle(java.lang.String Reference) {
+        //parcourir la iste des salles existantes //comparer la capacite
+        //envoie la dispo
+     //   return true;
+  //  }
+    
+   
 
 }

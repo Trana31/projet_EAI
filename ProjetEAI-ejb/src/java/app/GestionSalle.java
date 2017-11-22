@@ -2,21 +2,25 @@ package app;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.ejb.EJB;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.naming.NamingException;
 import message.Nommage;
+import webserver.SalleSingleton;
 
 /**
  *
  * @author 
  */
 public class GestionSalle extends ClientJMS {
-
+    
     private MessageConsumer mc1;
     private MessageConsumer mc2;
     private MessageProducer mp;

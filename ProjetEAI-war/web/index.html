@@ -1,16 +1,56 @@
-<!DOCTYPE html>
-<!--
-To change this license header, choose License Headers in Project Properties.
-To change this template file, choose Tools | Templates
-and open the template in the editor.
--->
 <html>
-    <head>
-        <title>TODO supply a title</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    </head>
-    <body>
-        <div>TODO write content</div>
-    </body>
-</html>
+<head>
+    <title>SOAP JavaScript Client Test</title>
+    <script type="text/javascript">
+        function soap() {
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.open('POST', 'http://localhost:8080/ProjetEAI-war/ProjetService', true);
+
+            // build SOAP request
+            var sr =
+            '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ser="http://services/">' +
+               '<soapenv:Header/>' +
+               '<soapenv:Body>' +
+                 '<ser:creerFicheProjet>' +
+                     '<nomClient>A</nomClient>' +
+                     '<coordClient>A</coordClient>' +
+                     '<appelManif>A</appelManif>' +
+                     '<typeManif>A</typeManif>' +
+                     '<nbrParticipant>2</nbrParticipant>' +
+                     '<dateManif>2</dateManif>' +
+                     '<trancheHorDeb>2</trancheHorDeb>' +
+                     '<trancheHorFin>2</trancheHorFin>' +
+                     '<typePresta>A</typePresta>' +
+                     '<boissonCocktail>A</boissonCocktail>' +
+                     '<vinsLunch>A</vinsLunch>' +
+                     '<animation>A</animation>' +
+                     '<prestaDeco>A</prestaDeco>' +
+                     '<prestaComEvenement>A</prestaComEvenement>' +
+                     '<PrestaSecu>A</PrestaSecu>' +
+                  '</ser:creerFicheProjet>' +
+               '</soapenv:Body>' +
+            '</soapenv:Envelope>';
+
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == 4) {
+                    if (xmlhttp.status == 200) {
+                        alert('done. use firebug/console to see network response');
+                    }
+                }
+            }
+            // Send the POST request
+            xmlhttp.setRequestHeader('Content-Type', 'text/xml');
+            xmlhttp.send(sr);
+            // send request
+            // ...
+        }
+    </script>
+</head>
+<body>
+    <form name="Demo" action="" method="post">
+        <div>
+            <input type="button" value="Soap" onclick="soap();" />
+        </div>
+    </form>
+</body>
+</html> <!-- typo -->
